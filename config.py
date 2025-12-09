@@ -25,5 +25,8 @@ SUM_NORM = colors.BoundaryNorm(SUM_LVL, 256)
 DIV_LVL = [-100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100, 120, 140, 160] #precipitation diffs
 DIV_NORM = colors.TwoSlopeNorm(vmin=-100, vcenter=0, vmax=160)
 
+W2L_LVL = [0, 0.1, 0.5, 1., 1.5, 2., 3., 4.]
+W2L_NORM = colors.BoundaryNorm(W2L_LVL, 256)
+
 PLOT_WINDOW = [-5, 25, 37, 62]      #Bounds: West, East, South, North
 
