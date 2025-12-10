@@ -47,13 +47,15 @@ def load_grid_data():
     return grid_data
 
 
-def read_merged_var_det(var, dts, data_dir):
+def read_merged_var_det(var, dts, data_dir, accu):
     """
     Reads input information from deterministic runs, i.e., only one realization per experiment.
 
     The merged files contain all time steps of a folder, i.e., step, step - 1h, step - 2h and step - 3h. 
-    # In that case, doing diff works "out of the box" for accumulated variables, because the first timestep
-    # in each assimilation cycle, i.e., step - 3h, is all zero.
+    In that case, doing diff works "out of the box" for accumulated variables (accu=True), because the first timestep
+    in each assimilation cycle, i.e., step - 3h, is all zero.
+    For instant variables (accu=False), there would be a conflict between variables at the starts and ends of subsequent
+    assimilation cycles. In that case, step - 3h is discarded as it suffers from the issues at initialization.
     """
 
     fnames = [f"{data_dir}/fc_R03B07_{var}_merged.{dt.year:02}{dt.month:02}{dt.day:02}{dt.hour:02}" for dt in dts]
@@ -62,14 +64,20 @@ def read_merged_var_det(var, dts, data_dir):
     for fname in fnames:
 
         dataset = xr.open_dataset(fname, engine="cfgrib", backend_kwargs={"indexpath": ""}).rename({"values": "cell"})[var]
-        dataset = dataset.diff(dim="step")
+        
+        if accu: #disaggregate
+            dataset = dataset.diff(dim="step")
+        else:
+            if dataset.sizes["step"] == 4: #if cycle start is contained in the file itself
+                dataset = dataset.isel(step=slice(1,None))
+
         dataset["step"] = dataset["valid_time"]
         datasets.append(dataset)
 
     return xr.concat(datasets, dim="step")
 
 
-def read_merged_var_ens(var, dts, data_dir):
+def read_merged_var_ens(var, dts, data_dir, accu):
     """
     Similar to read_merged_var_det, but concatenates the ensemble members to their own dimension.
     """
@@ -82,7 +90,13 @@ def read_merged_var_ens(var, dts, data_dir):
         for fname in fnames:
 
             infile = xr.open_dataset(fname, engine="cfgrib", backend_kwargs={"indexpath": ""}).rename({"values": "cell"})[var]
-            infile = infile.diff(dim="step")
+
+            if accu:
+                infile = infile.diff(dim="step")
+            else:   
+                if infile.sizes["step"] == 4: #if cycle start is contained in the file itself
+                    infile = infile.isel(step=slice(1,None))
+
             infile["step"] = infile["valid_time"]
             infiles.append(infile)
 
