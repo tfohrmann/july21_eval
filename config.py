@@ -18,6 +18,15 @@ PASSIVE_REGION = {
     "wy": 40    # latitude width  
 }
 
+PRUDENCE_REGIONS = {"BI": {"name": "British Isles", "lon": slice(-10, 2), "lat": slice(50, 59)},
+                    "IP": {"name": "Iberian Peninsula", "lon": slice(-10, 3), "lat": slice(36, 44)},
+                    "FR": {"name": "France", "lon": slice(-5, 5), "lat": slice(44, 50)},
+                    "ME": {"name": "Mid-Europe", "lon": slice(2, 16), "lat": slice(48, 55)},
+                    "SC": {"name": "Scandinavia", "lon": slice(5, 30), "lat": slice(55, 70)},
+                    "AL": {"name": "Alps", "lon": slice(5, 15), "lat": slice(44, 48)},
+                    "MD": {"name": "Mediterranean", "lon": slice(3, 25), "lat": slice(36, 44)},
+                    "EA": {"name": "Eastern Europe", "lon": slice(16, 30), "lat": slice(44, 55)}}
+
 # Plotting setups:
 SUM_LVL = [0, 0.1, 1 , 2, 5, 10, 15, 20, 30, 50, 75, 100, 125, 150, 200]    #precipitation sums
 SUM_NORM = colors.BoundaryNorm(SUM_LVL, 256)
