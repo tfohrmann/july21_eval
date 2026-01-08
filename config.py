@@ -39,3 +39,9 @@ W2L_NORM = colors.BoundaryNorm(W2L_LVL, 256)
 
 PLOT_WINDOW = [-5, 25, 37, 62]      #Bounds: West, East, South, North
 
+
+#Colors:
+c_ctl = "tab:blue"
+c_dry = "tab:orange"
+c_wet = "tab:green"
+c_rea = "black"
