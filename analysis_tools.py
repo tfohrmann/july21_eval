@@ -47,7 +47,7 @@ def load_grid_data():
     return grid_data
 
 
-def read_merged_var_det(var, dts, data_dir, accu):
+def read_merged_var_det(var, dts, data_dir, accu, format="grib"):
     """
     Reads input information from deterministic runs, i.e., only one realization per experiment.
 
@@ -63,21 +63,28 @@ def read_merged_var_det(var, dts, data_dir, accu):
     datasets = []
     for fname in fnames:
 
-        dataset = xr.open_dataset(fname, engine="cfgrib", backend_kwargs={"indexpath": ""}).rename({"values": "cell"})[var]
+        if format == "grib":
+            dataset = xr.open_dataset(fname, engine="cfgrib", backend_kwargs={"indexpath": ""}).rename({"values": "cell"})[var]
+        elif format == "netcdf":
+            dataset = xr.open_dataset(fname, engine="netcdf4").rename({"time": "step"})[var]
+        else:
+            raise NotImplementedError("Only grib or netcdf files for now.")
         
         if accu: #disaggregate
             dataset = dataset.diff(dim="step")
         else:
             if dataset.sizes["step"] == 4: #if cycle start is contained in the file itself
                 dataset = dataset.isel(step=slice(1,None))
+        
+        if format == "grib":
+            dataset["step"] = dataset["valid_time"]
 
-        dataset["step"] = dataset["valid_time"]
         datasets.append(dataset)
 
     return xr.concat(datasets, dim="step")
 
 
-def read_merged_var_ens(var, dts, data_dir, accu):
+def read_merged_var_ens(var, dts, data_dir, accu, format="grib"):
     """
     Similar to read_merged_var_det, but concatenates the ensemble members to their own dimension.
     """
@@ -89,15 +96,21 @@ def read_merged_var_ens(var, dts, data_dir, accu):
         infiles = []
         for fname in fnames:
 
-            infile = xr.open_dataset(fname, engine="cfgrib", backend_kwargs={"indexpath": ""}).rename({"values": "cell"})[var]
+            if format == "grib":
+                infile = xr.open_dataset(fname, engine="cfgrib", backend_kwargs={"indexpath": ""}).rename({"values": "cell"})[var]
+            elif format == "netcdf":
+                infile = xr.open_dataset(fname, engine="netcdf4").rename({"time": "step"})[var]
+            else:
+                raise NotImplementedError("Only grib or netcdf files for now.")
 
             if accu:
                 infile = infile.diff(dim="step")
             else:   
                 if infile.sizes["step"] == 4: #if cycle start is contained in the file itself
                     infile = infile.isel(step=slice(1,None))
-
-            infile["step"] = infile["valid_time"]
+                    
+            if format == "grib":
+                infile["step"] = infile["valid_time"]
             infiles.append(infile)
 
         data_arrays.append(xr.concat(infiles, dim="step"))
