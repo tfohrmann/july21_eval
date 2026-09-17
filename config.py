@@ -37,11 +37,11 @@ PRUDENCE_REGIONS = {"BI": {"name": "British Isles", "lon": slice(-10, 2), "lat":
                     "EA": {"name": "Eastern Europe", "lon": slice(16, 30), "lat": slice(44, 55)}}
 
 # Plotting setups:
-SUM_LVL = [0, 0.1, 1 , 2, 5, 10, 15, 20, 30, 50, 75, 100, 125, 150, 200]    #precipitation sums
+SUM_LVL = [0, 25, 50, 75, 100, 125, 150, 175]    #precipitation sums
 SUM_NORM = colors.BoundaryNorm(SUM_LVL, 256)
 
-DIV_LVL = [-160, -140, -120, -100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100, 120, 140, 160] #precipitation diffs
-DIV_NORM = colors.TwoSlopeNorm(vmin=-160, vcenter=0, vmax=160)
+DIV_LVL = [-120, -100, -80, -60, -40, -20, 0, 20, 40, 60, 80, 100, 120] #precipitation diffs
+DIV_NORM = colors.TwoSlopeNorm(vmin=-120, vcenter=0, vmax=120)
 
 W2L_LVL = [0, 0.1, 0.5, 1., 1.5, 2., 3., 4., 6.] #large:W2L_LVL = [0, 0.1, 0.5, 1., 1.5,  3., 5., 9.]
 W2L_NORM = colors.BoundaryNorm(W2L_LVL, 256)
